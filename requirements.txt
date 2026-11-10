@@ -1,0 +1,18 @@
+# CinematicSRT v2.0 - Core Dependencies
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.12
+pydantic>=2.10.0
+python-dotenv>=1.0.1
+aiohttp>=3.11.0
+httpx>=0.28.0
+
+# Speech-to-Text (CTranslate2 Backend)
+faster-whisper>=1.1.0
+
+# Local Translation (HuggingFace Meta NLLB-200)
+transformers>=4.46.0
+
+# PyTorch with CUDA (For NVIDIA GPU):
+# pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu121
+torch>=2.4.0

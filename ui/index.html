@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="cinematic-lifecycle-token" content="__CINEMATIC_LIFECYCLE_TOKEN__">
+  <title>CinematicSRT v2.0 — استوديو الترجمة السينمائي الذكي</title>
+  <style>
+    @font-face {
+      font-family: Cairo;
+      font-style: normal;
+      font-weight: 400 900;
+      font-display: swap;
+      src: url('/fonts/cairo-arabic.woff2') format('woff2');
+    }
+
+    :root {
+      color-scheme: dark;
+      --bg: #070913;
+      --bg2: #0d1224;
+      --surface: rgba(15, 20, 38, 0.86);
+      --soft: rgba(24, 31, 58, 0.78);
+      --panel: rgba(18, 24, 43, 0.78);
+      --border: rgba(139, 92, 246, 0.25);
+      --primary: #8b5cf6;
+      --primary2: #6366f1;
+      --primary-hover: #7c3aed;
+      --cyan: #06b6d4;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --muted2: #64748b;
+      --accent-ink: #ffffff;
+      --radius: 20px;
+      --input-bg: #0c1120;
+      --code-bg: rgba(0, 0, 0, 0.34);
+    }
+
+    body[data-theme="midnight"] {
+      color-scheme: dark;
+      --bg: #080b12;
+      --bg2: #0d1119;
+      --surface: rgba(13, 17, 25, 0.92);
+      --soft: #161d29;
+      --panel: #0d1119;
+      --border: #303744;
+      --primary: #ffc552;
+      --primary2: #ff9a3c;
+      --primary-hover: #ffb72b;
+      --cyan: #2dd4bf;
+      --green: #2dd4bf;
+      --text: #f2f5fc;
+      --muted: #acb8cc;
+      --muted2: #8493aa;
+      --accent-ink: #211502;
+      --radius: 22px;
+      --input-bg: #121824;
+      background: radial-gradient(ellipse at top, #20202a, #080b12 65%);
+    }
+
+    body[data-theme="studio"] {
+      color-scheme: light;
+      --bg: #f3f5f9;
+      --bg2: #ffffff;
+      --surface: #ffffff;
+      --soft: #eff3fa;
+      --panel: #ffffff;
+      --border: #d8dfeb;
+      --primary: #2447d6;
+      --primary2: #3860de;
+      --primary-hover: #1d39b5;
+      --cyan: #087650;
+      --green: #09805a;
+      --yellow: #b45309;
+      --red: #dc2626;
+      --text: #0f172a;
+      --muted: #475569;
+      --muted2: #64748b;
+      --accent-ink: #ffffff;
+      --radius: 18px;
+      --input-bg: #f8fafc;
+      --code-bg: #f1f5f9;
+      background: #f3f5f9;
+    }
+
+    body[data-theme="noir"] {
+      color-scheme: dark;
+      --bg: #0e0f12;
+      --bg2: #15161a;
+      --surface: #15161a;
+      --soft: #1d1e24;
+      --panel: #15161a;
+      --border: #33343c;
+      --primary: #ff5a36;
+      --primary2: #ff7a59;
+      --primary-hover: #e64926;
+      --cyan: #ff7a59;
+      --green: #34d399;
+      --text: #ececf0;
+      --muted: #b4b5bd;
+      --muted2: #8d8f9b;
+      --accent-ink: #160803;
+      --radius: 12px;
+      --input-bg: #1a1b21;
+      --code-bg: #0b0c0f;
+      background: #0e0f12;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+    body {
+      background:
+        radial-gradient(circle at 15% 10%, rgba(139, 92, 246, 0.16), transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.12), transparent 45%),
+        var(--bg);
+      color: var(--text);
+      font-family: 'Cairo', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.25s ease, color 0.2s ease;
+    }
+    body[data-theme="studio"], body[data-theme="noir"] {
+      background-image: none;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 18px 5%;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--primary), var(--cyan));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+    .logo-text h1 { font-size: 21px; font-weight: 900; letter-spacing: -0.4px; }
+    .logo-text span {
+      font-size: 11px; color: var(--cyan); font-weight: 800;
+      background: var(--soft); border: 1px solid var(--border);
+      padding: 2px 9px; border-radius: 99px;
+    }
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-header {
+      background: var(--soft);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 16px;
+      border-radius: 11px;
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-header:hover { border-color: var(--primary); transform: translateY(-1px); }
+    .btn-header.accent { border-color: var(--cyan); color: var(--cyan); }
+    .btn-header.danger {
+      border-color: rgba(239, 68, 68, 0.55);
+      color: var(--red);
+    }
+    .btn-header.danger:hover {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: var(--red);
+    }
+
+    main {
+      flex: 1;
+      padding: 28px 5% 44px;
+      max-width: 1120px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 38px rgba(0, 0, 0, 0.22);
+    }
+
+    /* Settings Drawer Panel */
+    .settings-shell[hidden] { display: none; }
+    .settings-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .settings-heading h2 { font-size: 20px; font-weight: 900; }
+    .close-settings {
+      background: var(--soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .preference-block {
+      padding: 18px;
+      border: 1px solid var(--border);
+      background: var(--soft);
+      border-radius: 15px;
+      min-width: 0;
+    }
+    .preference-block.full { grid-column: 1 / -1; }
+    .preference-block h3 { font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(--text); }
+    .preference-help { font-size: 12px; color: var(--muted); line-height: 1.8; margin-top: 8px; }
+    .input-unit { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+    .input-unit input {
+      width: 100%; min-width: 0;
+      background: var(--input-bg); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 14px; direction: ltr;
+    }
+    .input-unit span { font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+
+    .format-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .format-tab, .theme-choice {
+      color: var(--text);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 9px 15px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .format-tab[aria-selected="true"],
+    .theme-choice[aria-pressed="true"] {
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+    .format-list { display: flex; flex-wrap: wrap; gap: 8px; direction: ltr; min-height: 36px; }
+    .format-chip {
+      font: 700 12px monospace;
+      color: var(--text);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+    }
+    .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .theme-choice { text-align: start; padding: 10px; }
+    .theme-swatch {
+      display: block; height: 48px; border-radius: 8px; margin-bottom: 8px;
+      background: linear-gradient(125deg, var(--swatch-bg) 68%, var(--swatch-accent) 68%);
+      border: 1px solid rgba(128, 128, 128, 0.35);
+    }
+    .cloud-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .memory-box {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 11px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.32);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .settings-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px; margin-top: 14px;
+    }
+    .settings-status { color: var(--green); font-size: 13px; font-weight: 700; min-height: 20px; }
+
+    /* 5-Stage Stepper */
+    .steps-card { padding: 18px 20px; }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      direction: rtl;
+    }
+    .step-card {
+      border: 1px solid var(--border);
+      background: var(--soft);
+      border-radius: 15px;
+      padding: 13px;
+      color: var(--muted);
+      transition: border-color 0.25s, transform 0.2s, opacity 0.2s;
+      min-width: 0;
+    }
+    .step-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .step-card .num {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: rgba(128, 128, 128, 0.16);
+      display: grid; place-items: center;
+      font: 800 13px monospace;
+    }
+    .step-card .title { font-weight: 800; font-size: 14px; color: var(--text); margin-bottom: 2px; }
+    .step-card small { color: var(--muted); font-size: 11px; display: block; line-height: 1.4; }
+    .stage-percent { font: 800 12px monospace; color: var(--cyan); }
+    .stage-track { height: 5px; background: var(--input-bg); border-radius: 99px; overflow: hidden; margin-top: 10px; }
+    .stage-track i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--cyan)); transition: width 0.25s ease; }
+
+    .step-card.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 24px rgba(139, 92, 246, 0.16);
+    }
+    .step-card.active .num { background: var(--primary); color: var(--accent-ink); }
+    .step-card.done { border-color: var(--green); }
+    .step-card.done .num { background: var(--green); color: #fff; }
+    .step-card.done .stage-percent { color: var(--green); }
+    .step-card.skipped { opacity: 0.52; }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed var(--primary);
+      border-radius: 16px;
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--soft);
+      transition: all 0.25s ease;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+    .dropzone-icon { font-size: 46px; margin-bottom: 10px; }
+    .dropzone h3 { font-size: 18px; font-weight: 900; margin-bottom: 6px; }
+    .dropzone p { color: var(--muted); font-size: 13px; }
+    .limit-hint {
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    /* Studio Controls & Transcription Modes */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .mode-option {
+      border: 1px solid var(--border);
+      background: var(--soft);
+      border-radius: 13px;
+      padding: 12px 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+    .mode-option input { display: none; }
+    .mode-option:has(input:checked) {
+      border-color: var(--primary);
+      box-shadow: inset 0 0 0 1px var(--primary);
+    }
+    .mode-title { font-weight: 800; font-size: 14px; }
+    .mode-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .radio-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--muted2); flex-shrink: 0; position: relative;
+    }
+    .mode-option:has(input:checked) .radio-dot { border-color: var(--primary); }
+    .mode-option:has(input:checked) .radio-dot::after {
+      content: ''; position: absolute; inset: 3px;
+      background: var(--primary); border-radius: 50%;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 800;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    select, input[type="text"], input[type="number"] {
+      width: 100%; padding: 11px 13px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      font-size: 13px; outline: none;
+    }
+    select:focus, input:focus { border-color: var(--primary); }
+
+    .compute-banner {
+      margin-top: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 8px;
+      font-size: 12px; color: var(--muted);
+    }
+
+    .btn-submit {
+      width: 100%; margin-top: 20px; padding: 14px 18px;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      border: none; border-radius: 12px;
+      color: var(--accent-ink); font-size: 16px; font-weight: 900;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .btn-submit:hover:not(:disabled) { opacity: 0.94; transform: translateY(-1px); }
+
+    /* Progress Box */
+    .progress-box { display: none; text-align: center; }
+    .progress-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px; margin-bottom: 10px;
+    }
+    .lang-badge {
+      display: none;
+      color: var(--cyan);
+      background: var(--soft);
+      border: 1px solid var(--border);
+      padding: 5px 12px; border-radius: 99px;
+      font-size: 12px; font-weight: 700;
+    }
+    .progress-bar-wrap {
+      width: 100%; height: 11px;
+      background: var(--input-bg);
+      border-radius: 99px; overflow: hidden;
+      margin: 14px 0;
+      border: 1px solid var(--border);
+    }
+    .progress-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--cyan));
+      border-radius: 99px; transition: width 0.35s ease;
+    }
+    .stage-text { font-size: 15px; font-weight: 800; color: var(--cyan); }
+    .btn-cancel {
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 8px 18px; border-radius: 10px;
+      font-size: 13px; font-weight: 800;
+    }
+
+    /* Results Box */
+    .result-box { display: none; }
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .metric-pill {
+      background: var(--soft); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px; text-align: center;
+    }
+    .metric-label { font-size: 11px; color: var(--muted); }
+    .metric-val { font: 900 19px monospace; color: var(--green); margin-top: 3px; }
+
+    .video-wrap {
+      width: 100%; border-radius: 14px; overflow: hidden;
+      background: #000; margin-bottom: 20px; border: 1px solid var(--border);
+    }
+    video { width: 100%; display: block; max-height: 460px; }
+
+    .download-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+    .btn-dl {
+      padding: 13px 16px; border-radius: 11px;
+      font-weight: 800; font-size: 14px;
+      text-align: center; text-decoration: none; display: block;
+    }
+    .btn-srt { background: var(--primary); color: var(--accent-ink); }
+    .btn-ass { background: var(--soft); border: 1px solid var(--cyan); color: var(--cyan); }
+    .btn-vtt { background: var(--soft); border: 1px solid var(--border); color: var(--text); }
+
+    /* Live SRT Text Preview */
+    .preview-section { margin-top: 22px; }
+    .preview-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px; font-size: 14px; font-weight: 800; color: var(--muted);
+    }
+    .preview-toggle {
+      background: var(--soft); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 5px 12px; font-size: 12px; font-weight: 700;
+    }
+    .srt-preview {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      font: 500 13px/1.75 monospace;
+      direction: ltr; text-align: left;
+      white-space: pre-wrap;
+      max-height: 300px; overflow: auto;
+      color: var(--text);
+    }
+
+    /* Setup Wizard Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(8px); display: none;
+      align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 26px; width: 100%; max-width: 640px;
+      max-height: 92vh; overflow-y: auto;
+    }
+
+    .shutdown-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 9, 19, 0.88);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+    .shutdown-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    @media (max-width: 900px) {
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .settings-layout, .theme-grid, .mode-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-area">
+      <div class="logo-icon">🎬</div>
+      <div class="logo-text">
+        <h1>CinematicSRT</h1>
+        <span>v2.0 Studio Edition</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-header accent" type="button" onclick="openWizard()">🔍 فحص النظام والتثبيت</button>
+      <button class="btn-header" type="button" id="toggleSettingsBtn" aria-controls="settingsPanel" aria-expanded="false" onclick="toggleSettingsPanel()">⚙️ الإعدادات والصيغ والمظهر</button>
+      <button class="btn-header danger" type="button" id="btnShutdownApp" onclick="shutdownApplication()" title="إيقاف الخادم والبرنامج بالكامل">⏻ إيقاف البرنامج</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Unified Expandable Studio Settings Panel -->
+    <section class="card settings-shell" id="settingsPanel" hidden aria-labelledby="settingsTitle">
+      <div class="settings-heading">
+        <div>
+          <h2 id="settingsTitle">⚙️ إعدادات الاستوديو والأداء</h2>
+          <p class="preference-help">تُحفظ تفضيلات الواجهة في المتصفح وتُطبق على الرفع، بينما تُحفظ المفاتيح وإعدادات المحرك في ملف <code>.env</code> محلياً.</p>
+        </div>
+        <button class="close-settings" type="button" onclick="closeSettingsPanel()">إغلاق ×</button>
+      </div>
+
+      <div class="settings-layout">
+        <div class="preference-block">
+          <h3>📦 حد حجم الملف المسموح</h3>
+          <label class="field-label" for="maxFileSizeMB" style="font-size:12px; color:var(--muted);">الحد الأقصى للملف الواحد</label>
+          <div class="input-unit">
+            <input id="maxFileSizeMB" type="number" inputmode="numeric" min="1" max="2147483647" step="1" value="4000">
+            <span>ميجابايت</span>
+          </div>
+          <p class="preference-help">القيمة الافتراضية 4000MB ويمكن زيادتها أو تقليلها حسب مساحة القرص؛ يتم الرفع على دفعات لتقليل استهلاك الذاكرة.</p>
+        </div>
+
+        <div class="preference-block">
+          <h3>⚡ موارد المعالجة (Compute Mode)</h3>
+          <label class="field-label" for="computeMode" style="font-size:12px; color:var(--muted);">توزيع تشغيل Whisper و NLLB</label>
+          <select id="computeMode" style="margin-top:6px;">
+            <option value="hybrid">المعالج والكرت · CPU + GPU (المشترك - موصى به)</option>
+            <option value="cpu">المعالج فقط · CPU Only</option>
+            <option value="gpu">كرت الشاشة بالتتابع · GPU Sequential</option>
+          </select>
+          <p class="preference-help" id="computeHelp">جارٍ فحص الموارد المحلية…</p>
+        </div>
+
+        <div class="preference-block full">
+          <h3>📂 الصيغ المدعومة</h3>
+          <div class="format-tabs" role="tablist" aria-label="نوع الملف">
+            <button class="format-tab" id="formatVideo" type="button" role="tab" data-format="video" aria-selected="true" aria-controls="formatPanel">فيديو</button>
+            <button class="format-tab" id="formatAudio" type="button" role="tab" data-format="audio" aria-selected="false" aria-controls="formatPanel" tabindex="-1">صوت</button>
+            <button class="format-tab" id="formatText" type="button" role="tab" data-format="text" aria-selected="false" aria-controls="formatPanel" tabindex="-1">نص وترجمة</button>
+          </div>
+          <div id="formatPanel" role="tabpanel" aria-labelledby="formatVideo">
+            <div class="format-list" id="formatList"></div>
+            <p class="preference-help" id="formatNote"></p>
+          </div>
+        </div>
+
+        <div class="preference-block full">
+          <h3>🎨 المظهر (Theme)</h3>
+          <div class="theme-grid" role="group" aria-label="اختيار المظهر">
+            <button class="theme-choice" type="button" data-theme-choice="classic" aria-pressed="true">
+              <span class="theme-swatch" style="--swatch-bg:#0f1426;--swatch-accent:#8b5cf6"></span>
+              المظهر الحالي
+            </button>
+            <button class="theme-choice" type="button" data-theme-choice="midnight" aria-pressed="false">
+              <span class="theme-swatch" style="--swatch-bg:#0d1119;--swatch-accent:#ffc552"></span>
+              Midnight Glass
+            </button>
+            <button class="theme-choice" type="button" data-theme-choice="studio" aria-pressed="false">
+              <span class="theme-swatch" style="--swatch-bg:#f3f5f9;--swatch-accent:#2447d6"></span>
+              Studio Light
+            </button>
+            <button class="theme-choice" type="button" data-theme-choice="noir" aria-pressed="false">
+              <span class="theme-swatch" style="--swatch-bg:#15161a;--swatch-accent:#ff5a36"></span>
+              Editor Noir
+            </button>
+          </div>
+        </div>
+
+        <div class="preference-block full">
+          <h3>🧠 النماذج المحلية ومفاتيح السحابة (API Keys)</h3>
+          <div class="cloud-grid">
+            <div class="form-group">
+              <label for="whisperModelSelect">نموذج Whisper المحلي</label>
+              <select id="whisperModelSelect">
+                <option value="medium">Whisper Medium (~1.5GB) — أعلى دقة</option>
+                <option value="small">Whisper Small (~460MB) — متوازن وسريع</option>
+                <option value="base">Whisper Base (~140MB) — فائق السرعة</option>
+                <option value="tiny">Whisper Tiny (~75MB) — خفيف جداً</option>
+                <option value="large-v3">Whisper Large-v3 (~3GB) — جودة قصوى</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="geminiKey">Google Gemini API Key</label>
+              <input type="text" id="geminiKey" placeholder="AIzaSy...">
+            </div>
+            <div class="form-group">
+              <label for="groqKey">Groq API Key</label>
+              <input type="text" id="groqKey" placeholder="gsk_...">
+            </div>
+            <div class="form-group">
+              <label for="qwenUrl">رابط Qwen المحلي (llama.cpp)</label>
+              <input type="text" id="qwenUrl" placeholder="http://127.0.0.1:8080/v1">
+            </div>
+          </div>
+          <div class="memory-box" id="localMemoryBox">
+            <strong>📊 حالة الذاكرة والموارد:</strong> جارٍ الفحص...
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <div class="settings-status" id="settingsStatus" role="status" aria-live="polite"></div>
+        <button class="btn-submit" style="width:auto; margin-top:0; padding:10px 24px; font-size:14px;" type="button" onclick="saveServerSettings()">💾 حفظ إعدادات المحرك والمفاتيح</button>
+      </div>
+    </section>
+
+    <!-- 5-Stage Live Stepper -->
+    <section class="card steps-card">
+      <div class="steps">
+        <div class="step-card active" id="step-prepare">
+          <div class="step-top">
+            <div class="num">1</div>
+            <span class="stage-percent">—</span>
+          </div>
+          <div class="title">تهيئة الملف</div>
+          <small>رفع الملف واستخراج الصوت</small>
+          <div class="stage-track"><i></i></div>
+        </div>
+        <div class="step-card" id="step-transcribe">
+          <div class="step-top">
+            <div class="num">2</div>
+            <span class="stage-percent">—</span>
+          </div>
+          <div class="title">تفريغ الصوت</div>
+          <small>Whisper يحول الكلام إلى نص</small>
+          <div class="stage-track"><i></i></div>
+        </div>
+        <div class="step-card" id="step-segment">
+          <div class="step-top">
+            <div class="num">3</div>
+            <span class="stage-percent">—</span>
+          </div>
+          <div class="title">تجهيز المقاطع</div>
+          <small>تحديد اللغة وبناء المقاطع</small>
+          <div class="stage-track"><i></i></div>
+        </div>
+        <div class="step-card" id="step-translate">
+          <div class="step-top">
+            <div class="num">4</div>
+            <span class="stage-percent">—</span>
+          </div>
+          <div class="title">ترجمة النص</div>
+          <small>الترجمة العربية ومطابقة التوقيت</small>
+          <div class="stage-track"><i></i></div>
+        </div>
+        <div class="step-card" id="step-export">
+          <div class="step-top">
+            <div class="num">5</div>
+            <span class="stage-percent">—</span>
+          </div>
+          <div class="title">حفظ الترجمة</div>
+          <small>تصدير SRT / ASS / VTT + QC</small>
+          <div class="stage-track"><i></i></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Upload & Studio Controls -->
+    <section class="card" id="uploadCard">
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <div class="dropzone-icon">📼</div>
+        <h3 id="fileLabel">اسحب الفيديو أو الملف الصوتي أو ملف الترجمة هنا</h3>
+        <p style="direction: rtl; text-align: center; margin-top: 6px; font-weight: 600;">يدعم جميع صيغ الفيديو (MP4, MKV, AVI, MOV) والملفات الصوتية (MP3, WAV, M4A)</p>
+        <div class="limit-hint" id="uploadLimitHint">جارٍ تحميل حدود الرفع وإعدادات الموارد...</div>
+      </div>
+      <input type="file" id="fileInput" style="display:none" onchange="handleFile(this.files[0])">
+
+      <!-- Transcription Sensitivity Modes -->
+      <div id="audioOptionsWrap">
+        <div class="mode-grid">
+          <label class="mode-option">
+            <div>
+              <div class="mode-title">⚡ عادي</div>
+              <div class="mode-desc">أسرع معالجة للصوت الواضح</div>
+            </div>
+            <span class="radio-dot"></span>
+            <input type="radio" name="transcriptionMode" value="normal">
+          </label>
+          <label class="mode-option">
+            <div>
+              <div class="mode-title">⚖️ متوازن <span style="color:var(--green);font-size:11px;">موصى به</span></div>
+              <div class="mode-desc">توازن مثالي بين السرعة والدقة</div>
+            </div>
+            <span class="radio-dot"></span>
+            <input type="radio" name="transcriptionMode" value="balanced" checked>
+          </label>
+          <label class="mode-option">
+            <div>
+              <div class="mode-title">🎧 صوت هادئ</div>
+              <div class="mode-desc">دقة أعلى للأصوات المنخفضة</div>
+            </div>
+            <span class="radio-dot"></span>
+            <input type="radio" name="transcriptionMode" value="low_volume">
+          </label>
+        </div>
+      </div>
+
+      <div class="controls-grid">
+        <div class="form-group">
+          <label for="transcribeProvider">🎤 محرك التفريغ الصوتي:</label>
+          <select id="transcribeProvider">
+            <option value="local">🟢 Whisper المحلي (حسب وضع الحوسبة)</option>
+            <option value="groq">⚡ سحابة Groq Whisper-large-v3 (فائق السرعة)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="translateProvider">🌍 محرك الترجمة العربية:</label>
+          <select id="translateProvider">
+            <option value="local">🟢 نموذج Meta NLLB-200 المحلي (أوفلاين بالكامل)</option>
+            <option value="gemini">🌟 Google Gemini API (صياغة وسياق سينمائي)</option>
+            <option value="groq">⚡ سحابة Groq Llama 3.3 (سريع جداً)</option>
+            <option value="qwen">💻 نموذج Qwen المحلي (عبر llama.cpp)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="langSelect">🌐 اللغة المصدر:</label>
+          <select id="langSelect">
+            <option value="">تحديد تلقائي (موصى به للفيديو)</option>
+            <option value="en">الإنجليزية (English)</option>
+            <option value="fr">الفرنسية (Français)</option>
+            <option value="de">الألمانية (Deutsch)</option>
+            <option value="es">الإسبانية (Español)</option>
+            <option value="it">الإيطالية (Italiano)</option>
+            <option value="pt">البرتغالية (Português)</option>
+            <option value="ru">الروسية (Русский)</option>
+            <option value="ja">اليابانية (日本語)</option>
+            <option value="ko">الكورية (한국어)</option>
+            <option value="zh">الصينية (中文)</option>
+            <option value="tr">التركية (Türkçe)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="compute-banner">
+        <span id="activeComputeSummary">الوضع النشط: جارٍ القراءة...</span>
+        <span style="color:var(--muted2);">يمكن تعديل الموارد والصيغ والمظهر من الإعدادات بالأعلى</span>
+      </div>
+
+      <button class="btn-submit" id="btnStart" type="button" onclick="startPipeline()" disabled>🚀 بدء المعالجة والترجمة الآن</button>
+    </section>
+
+    <!-- Progress Card -->
+    <section class="card progress-box" id="progressCard">
+      <div class="progress-meta">
+        <h2 style="font-size: 20px; font-weight: 900;" id="progressFilename">جارٍ معالجة الملف...</h2>
+        <div class="lang-badge" id="langDetected">🌐 اللغة المكتشفة: <span id="langName">—</span></div>
+      </div>
+      <div class="stage-text" id="stageText">تجهيز الملف...</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+        <div style="font: 800 15px monospace; color: var(--green);" id="progressPct">0%</div>
+        <button id="btnCancelJob" class="btn-cancel" type="button" onclick="cancelCurrentJob()">⛔ إلغاء المعالجة وتنظيف الملفات</button>
+      </div>
+    </section>
+
+    <!-- Results Card -->
+    <section class="card result-box" id="resultCard">
+      <h2 style="font-size: 22px; font-weight: 900; margin-bottom: 16px; color: var(--green);">🎉 اكتملت الترجمة بنجاح!</h2>
+
+      <div id="qcBanner" style="display:none; margin-bottom: 16px; padding: 12px 16px; border-radius: 10px; background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.4); color: var(--yellow); font-size: 13px; font-weight: 700;">
+        <span id="qcBannerText"></span>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-pill">
+          <div class="metric-label">التفريغ الصوتي</div>
+          <div class="metric-val" id="resWhisperTime">--</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">الترجمة للعربية</div>
+          <div class="metric-val" id="resTransTime">--</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">إجمالي الوقت</div>
+          <div class="metric-val" id="resTotalTime">--</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">عدد الأسطر</div>
+          <div class="metric-val" id="resSegments">--</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">اللغة الأصلية</div>
+          <div class="metric-val" id="resDetectedLang" style="font-family:inherit;">--</div>
+        </div>
+      </div>
+
+      <div class="video-wrap" id="videoWrap">
+        <video id="videoPreview" controls>
+          <track id="subTrack" label="العربية" kind="subtitles" srclang="ar" default>
+        </video>
+      </div>
+
+      <div class="download-btns">
+        <a class="btn-dl btn-srt" id="dlSrtBtn" download>📥 تحميل ترجمة SRT</a>
+        <a class="btn-dl btn-ass" id="dlAssBtn" download>🎨 تحميل ASS السينمائية الملونة</a>
+        <a class="btn-dl btn-vtt" id="dlVttBtn" download>🌐 تحميل VTT للويب</a>
+      </div>
+
+      <div class="preview-section" id="previewSection">
+        <div class="preview-header">
+          <span>📝 معاينة نص الترجمة (<span id="previewCount">0</span> مقطع)</span>
+          <button class="preview-toggle" id="previewToggleBtn" type="button" onclick="togglePreview()">إخفاء ▲</button>
+        </div>
+        <div class="srt-preview" id="srtPreview">جارٍ تحميل المعاينة...</div>
+      </div>
+
+      <button class="btn-submit" style="margin-top: 20px; background: var(--soft); color: var(--text); border: 1px solid var(--border);" type="button" onclick="resetUI()">🔄 ترجمة ملف جديد</button>
+    </section>
+  </main>
+
+  <!-- Setup Wizard Modal -->
+  <div class="modal-overlay" id="wizardModal" style="display:none;">
+    <div class="modal">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="margin:0; font-size:18px; font-weight:900;">🚀 معالج الإعداد وفحص الجهاز (Setup Wizard)</h3>
+        <button type="button" onclick="closeWizard()" style="background:none; border:none; color:var(--muted); font-size:20px;">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 18px;">يفحص هذا المعالج كرت الشاشة وFFmpeg والنماذج المحلية ويقترح وضع التشغيل الأنسب.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px;">
+        <div style="background:var(--soft); border:1px solid var(--border); border-radius:12px; padding:12px;">
+          <div style="font-size:11px; color:var(--muted);">كرت الشاشة (GPU):</div>
+          <div style="font-weight:800; font-size:13px; color:var(--cyan); margin-top:4px;" id="wizGpu">جاري الفحص...</div>
+          <div style="font-size:11px; color:var(--green); margin-top:4px;" id="wizCuda">...</div>
+        </div>
+        <div style="background:var(--soft); border:1px solid var(--border); border-radius:12px; padding:12px;">
+          <div style="font-size:11px; color:var(--muted);">أداة FFmpeg لمعالجة الصوت:</div>
+          <div style="font-weight:800; font-size:13px; margin-top:4px;" id="wizFfmpeg">جاري الفحص...</div>
+          <button id="btnInstallFfmpeg" type="button" onclick="installFfmpeg()" style="display:none; margin-top:6px; font-size:11px; padding:4px 10px; border-radius:6px; background:var(--primary); color:var(--accent-ink); border:none;">⚡ تحميل FFmpeg تلقائياً</button>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border); padding-top:14px;">
+        <h4 style="font-size:14px; margin-bottom:10px;">اختر نمط التشغيل المفضل لديك:</h4>
+        <div style="display:flex; gap:10px; margin-bottom:14px;">
+          <button class="btn-dl" type="button" id="tabCloudBtn" onclick="switchWizardTab('cloud')" style="background:var(--soft); border:1px solid var(--primary); color:var(--text); flex:1;">🚀 النمط السحابي (API)</button>
+          <button class="btn-dl" type="button" id="tabLocalBtn" onclick="switchWizardTab('local')" style="background:var(--input-bg); border:1px solid var(--border); color:var(--muted); flex:1;">💻 النمط المحلي (أوفلاين)</button>
+        </div>
+
+        <div id="wizCloudTab">
+          <div class="form-group" style="margin-bottom:10px;">
+            <label for="wizGeminiKey">Google Gemini API Key:</label>
+            <input type="text" id="wizGeminiKey" placeholder="AIzaSy...">
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label for="wizGroqKey">Groq API Key:</label>
+            <input type="text" id="wizGroqKey" placeholder="gsk_...">
+          </div>
+          <button class="btn-submit" style="margin-top:0;" type="button" onclick="saveWizardCloud()">💾 حفظ وبدء الاستخدام</button>
+        </div>
+
+        <div id="wizLocalTab" style="display:none;">
+          <div style="background:var(--soft); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:13px; font-weight:700;">🎤 نموذج التفريغ Whisper Medium (~1.5GB)</div>
+              <div style="font-size:11px; color:var(--muted);" id="statWhisperLocal">جاري الفحص...</div>
+            </div>
+            <button id="btnDlWhisper" type="button" onclick="downloadModel('whisper')" style="font-size:12px; padding:6px 12px; border-radius:8px; background:var(--primary); color:var(--accent-ink); border:none;">تحميل</button>
+          </div>
+          <div style="background:var(--soft); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:13px; font-weight:700;">🌍 نموذج الترجمة Meta NLLB-200 (~1.2GB)</div>
+              <div style="font-size:11px; color:var(--muted);" id="statNllbLocal">جاري الفحص...</div>
+            </div>
+            <button id="btnDlNllb" type="button" onclick="downloadModel('nllb')" style="font-size:12px; padding:6px 12px; border-radius:8px; background:var(--primary); color:var(--accent-ink); border:none;">تحميل</button>
+          </div>
+          <div id="wizDlStatus" style="display:none; margin-bottom:12px; font-size:12px; color:var(--cyan); text-align:center;">
+            <span id="wizDlTask">جاري التحميل...</span>
+          </div>
+          <button class="btn-submit" style="margin-top:0;" type="button" onclick="closeWizard()">✅ تم، التوجه للاستوديو</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="shutdown-overlay" id="shutdownOverlay" role="dialog" aria-modal="true" aria-labelledby="shutdownTitle">
+    <div class="shutdown-card">
+      <div style="font-size: 42px; margin-bottom: 12px;">⏻</div>
+      <h2 id="shutdownTitle" style="font-size: 20px; font-weight: 900; margin-bottom: 10px;">تم إيقاف البرنامج بالكامل</h2>
+      <p id="shutdownDesc" style="font-size: 13px; color: var(--muted); line-height: 1.9;">تم إغلاق الخادم المحلي لـ CinematicSRT v2.0 بأمان. يمكنك الآن إغلاق هذه النافذة أو إعادة تشغيل البرنامج من الأيقونة.</p>
+    </div>
+  </div>
+
+  <script>
+    const STAGE_MAP = {
+      prepare: 'step-prepare',
+      transcribe: 'step-transcribe',
+      segment: 'step-segment',
+      translate: 'step-translate',
+      export: 'step-export'
+    };
+    const AUDIO_ONLY_EXTS = /\.(mp3|m4a|m4b|wav|flac|ogg|opus|aac|wma|aiff|aif|amr)$/i;
+    const SUBTITLE_EXTS = /\.(srt|ass|vtt)$/i;
+    const THEME_IDS = ['classic', 'midnight', 'studio', 'noir'];
+
+    let selectedFile = null;
+    let activeJobId = null;
+    let hasRunningJob = false;
+    let hasActiveUpload = false;
+    let hasActiveDownload = false;
+
+    function hasActiveWork() {
+      return Boolean(hasRunningJob || hasActiveUpload || hasActiveDownload);
+    }
+    let activeWs = null;
+    let pollTimer = null;
+    let previewVisible = true;
+    let runtimeSettings = null;
+    let preferences = {};
+    try {
+      preferences = JSON.parse(localStorage.getItem('cinematic.v2.preferences.v1') || '{}') || {};
+    } catch { preferences = {}; }
+
+    function applyTheme(theme) {
+      theme = THEME_IDS.includes(theme) ? theme : 'classic';
+      if (theme === 'classic') {
+        delete document.body.dataset.theme;
+      } else {
+        document.body.dataset.theme = theme;
+      }
+      preferences.theme = theme;
+      document.querySelectorAll('[data-theme-choice]').forEach(btn => {
+        btn.setAttribute('aria-pressed', String(btn.dataset.themeChoice === theme));
+      });
+    }
+
+    function persistPreferences(msg) {
+      try {
+        localStorage.setItem('cinematic.v2.preferences.v1', JSON.stringify(preferences));
+        document.getElementById('settingsStatus').textContent = msg || 'حُفظت اختيارات الواجهة في المتصفح.';
+      } catch {
+        document.getElementById('settingsStatus').textContent = 'تُطبق الاختيارات في هذه الجلسة فقط.';
+      }
+    }
+
+    function toggleSettingsPanel() {
+      const panel = document.getElementById('settingsPanel');
+      const nextHidden = !panel.hidden;
+      panel.hidden = nextHidden;
+      document.getElementById('toggleSettingsBtn').setAttribute('aria-expanded', String(!nextHidden));
+      if (!nextHidden) {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function closeSettingsPanel() {
+      document.getElementById('settingsPanel').hidden = true;
+      document.getElementById('toggleSettingsBtn').setAttribute('aria-expanded', 'false');
+    }
+
+    document.querySelectorAll('[data-theme-choice]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyTheme(btn.dataset.themeChoice);
+        persistPreferences('تم تطبيق وحفظ المظهر المختار.');
+      });
+    });
+    applyTheme(preferences.theme);
+
+    function renderFormats(kind) {
+      if (!runtimeSettings || !runtimeSettings.formats) return;
+      const tabs = [...document.querySelectorAll('[data-format]')];
+      tabs.forEach(btn => {
+        const selected = btn.dataset.format === kind;
+        btn.setAttribute('aria-selected', String(selected));
+        btn.tabIndex = selected ? 0 : -1;
+      });
+      const activeTab = tabs.find(btn => btn.dataset.format === kind);
+      if (activeTab) {
+        document.getElementById('formatPanel').setAttribute('aria-labelledby', activeTab.id);
+      }
+      const exts = runtimeSettings.formats[kind] || [];
+      document.getElementById('formatList').replaceChildren(...exts.map(ext => {
+        const chip = document.createElement('span');
+        chip.className = 'format-chip';
+        chip.textContent = ext.toUpperCase();
+        return chip;
+      }));
+      document.getElementById('formatNote').textContent = runtimeSettings.format_notes?.[kind] || '';
+    }
+
+    document.querySelectorAll('[data-format]').forEach((btn, idx, tabs) => {
+      btn.addEventListener('click', () => renderFormats(btn.dataset.format));
+      btn.addEventListener('keydown', (e) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+        e.preventDefault();
+        const target = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (idx + (e.key === 'ArrowLeft' ? 1 : -1) + tabs.length) % tabs.length;
+        tabs[target].focus();
+        renderFormats(tabs[target].dataset.format);
+      });
+    });
+
+    function updatePreferenceSummary() {
+      const limit = Number(document.getElementById('maxFileSizeMB').value) || 4000;
+      const modeSelect = document.getElementById('computeMode');
+      const mode = modeSelect.value;
+      const modeLabels = {
+        cpu: 'المعالج فقط (CPU)',
+        hybrid: 'المشترك (CPU + GPU)',
+        gpu: 'كرت الشاشة بالتتابع (GPU)'
+      };
+      const descriptions = {
+        cpu: 'التفريغ والترجمة على المعالج فقط بدون استهلاك VRAM.',
+        hybrid: 'التفريغ على المعالج والترجمة على كرت الشاشة بالتتابع — الوضع الآمن والموصى به لبطاقات 4GB VRAM.',
+        gpu: 'التفريغ على الكرت ثم تفريغ الذاكرة وتشغيل الترجمة على الكرت بالتتابع؛ قد يكون أبطأ على الكروت محدودة الذاكرة.'
+      };
+      document.getElementById('computeHelp').textContent = descriptions[mode] || '';
+      document.getElementById('activeComputeSummary').textContent = `⚡ وضع الحوسبة النشط: ${modeLabels[mode] || mode} · الحد: ${limit.toLocaleString('ar')} MB`;
+      document.getElementById('uploadLimitHint').textContent =
+        `فيديو (15 صيغة) · صوت (12 صيغة) · ترجمة (SRT / ASS / VTT) · حد الرفع الحالي: ${limit.toLocaleString('ar')} ميجابايت`;
+    }
+
+    document.getElementById('maxFileSizeMB').addEventListener('change', (e) => {
+      const val = Number(e.target.value);
+      if (!Number.isSafeInteger(val) || val < 1 || val > 2147483647) {
+        e.target.setCustomValidity('أدخل عدداً صحيحاً موجباً بين 1 و 2147483647 ميجابايت');
+        e.target.reportValidity();
+        return;
+      }
+      e.target.setCustomValidity('');
+      preferences.max_file_size_mb = val;
+      persistPreferences('تم تحديث حد حجم الملف المسموح.');
+      updatePreferenceSummary();
+    });
+    document.getElementById('maxFileSizeMB').addEventListener('input', (e) => e.target.setCustomValidity(''));
+
+    document.getElementById('computeMode').addEventListener('change', (e) => {
+      preferences.compute_mode = e.target.value;
+      persistPreferences('تم تحديث وضع الموارد والحوسبة.');
+      updatePreferenceSummary();
+    });
+
+    async function loadRuntimeSettings() {
+      const startBtn = document.getElementById('btnStart');
+      try {
+        const res = await fetch('/api/settings');
+        if (!res.ok) throw new Error('settings');
+        runtimeSettings = await res.json();
+
+        const savedMax = preferences.max_file_size_mb;
+        document.getElementById('maxFileSizeMB').value =
+          (Number.isSafeInteger(savedMax) && savedMax >= 1 && savedMax <= 2147483647)
+            ? savedMax
+            : (runtimeSettings.default_max_file_size_mb || 4000);
+
+        const computeSel = document.getElementById('computeMode');
+        [...computeSel.options].forEach(opt => {
+          const supported = Boolean(runtimeSettings.compute_modes?.[opt.value]);
+          opt.disabled = !supported;
+          opt.textContent = opt.textContent.replace(/ · غير متاح.*$/, '');
+          if (!supported) opt.textContent += ' · غير متاح على هذا الجهاز';
+        });
+        const prefCompute = preferences.compute_mode;
+        computeSel.value = runtimeSettings.compute_modes?.[prefCompute]
+          ? prefCompute
+          : (runtimeSettings.compute_mode || runtimeSettings.default_compute_mode || 'cpu');
+
+        if (runtimeSettings.whisper_model) {
+          document.getElementById('whisperModelSelect').value = runtimeSettings.whisper_model;
+        }
+        if (runtimeSettings.qwen_url) {
+          document.getElementById('qwenUrl').value = runtimeSettings.qwen_url;
+        }
+        if (runtimeSettings.gemini_configured) {
+          document.getElementById('geminiKey').placeholder = '•••••••••••••••• (محفوظ مسبقاً)';
+        }
+        if (runtimeSettings.groq_configured) {
+          document.getElementById('groqKey').placeholder = '•••••••••••••••• (محفوظ مسبقاً)';
+        }
+        if (runtimeSettings.formats) {
+          document.getElementById('fileInput').accept = Object.values(runtimeSettings.formats).flat().join(',');
+        }
+        renderFormats('video');
+        updatePreferenceSummary();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('uploadLimitHint').textContent = 'تعذر الاتصال بإعدادات الخادم؛ تأكد من تشغيل الخادم.';
+      } finally {
+        if (selectedFile) startBtn.disabled = false;
+      }
+    }
+
+    async function saveServerSettings() {
+      const limitInput = document.getElementById('maxFileSizeMB');
+      const maxMB = Number(limitInput.value);
+      if (!Number.isSafeInteger(maxMB) || maxMB < 1 || maxMB > 2147483647) {
+        limitInput.setCustomValidity('أدخل عدداً صحيحاً بين 1 و 2147483647');
+        limitInput.reportValidity();
+        return;
+      }
+      const payload = {
+        whisper_model: document.getElementById('whisperModelSelect').value,
+        compute_mode: document.getElementById('computeMode').value,
+        max_file_size_mb: maxMB,
+      };
+      const gKey = document.getElementById('geminiKey').value.trim();
+      const grKey = document.getElementById('groqKey').value.trim();
+      const qUrl = document.getElementById('qwenUrl').value.trim();
+      if (gKey) payload.gemini_key = gKey;
+      if (grKey) payload.groq_key = grKey;
+      if (qUrl) payload.qwen_url = qUrl;
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'فشل الحفظ');
+        preferences.max_file_size_mb = maxMB;
+        preferences.compute_mode = payload.compute_mode;
+        persistPreferences('✅ ' + (data.message || 'تم حفظ الإعدادات بنجاح'));
+        if (data.settings) runtimeSettings = data.settings;
+        updatePreferenceSummary();
+      } catch (err) {
+        document.getElementById('settingsStatus').textContent = '❌ ' + err.message;
+      }
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      selectedFile = file;
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      document.getElementById('fileLabel').textContent = `تم اختيار: ${file.name} (${mb} MB)`;
+      document.getElementById('btnStart').disabled = false;
+
+      const isSub = SUBTITLE_EXTS.test(file.name);
+      document.getElementById('audioOptionsWrap').style.opacity = isSub ? '0.45' : '1';
+      document.getElementById('transcribeProvider').disabled = isSub;
+    }
+
+    const dropzone = document.getElementById('dropzone');
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function getTranscriptionMode() {
+      const el = document.querySelector('input[name="transcriptionMode"]:checked');
+      return el ? el.value : 'balanced';
+    }
+
+    function updateSteps(stages) {
+      if (!Array.isArray(stages)) return;
+      stages.forEach(s => {
+        const card = document.getElementById(STAGE_MAP[s.id]);
+        if (!card) return;
+        card.classList.toggle('active', s.state === 'active');
+        card.classList.toggle('done', s.state === 'done');
+        card.classList.toggle('skipped', s.state === 'skipped');
+        const known = typeof s.percent === 'number';
+        const label = s.state === 'skipped'
+          ? 'غير مطلوبة'
+          : known ? `${s.percent}%`
+          : s.state === 'active' ? 'جارٍ العمل…' : '—';
+        card.querySelector('.stage-percent').textContent = label;
+        card.querySelector('.stage-track i').style.width = known ? `${s.percent}%` : (s.state === 'done' ? '100%' : '0%');
+      });
+    }
+
+    function resetStepsUI() {
+      Object.values(STAGE_MAP).forEach((id, idx) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('active', 'done', 'skipped');
+        if (idx === 0) el.classList.add('active');
+        el.querySelector('.stage-percent').textContent = '—';
+        el.querySelector('.stage-track i').style.width = '0%';
+      });
+    }
+
+    async function startPipeline() {
+      if (!selectedFile) return;
+
+      const limitInput = document.getElementById('maxFileSizeMB');
+      const maxMB = Number(limitInput.value) || 4000;
+      if (!Number.isSafeInteger(maxMB) || maxMB < 1 || maxMB > 2147483647) {
+        toggleSettingsPanel();
+        limitInput.reportValidity();
+        return;
+      }
+      if (selectedFile.size > maxMB * 1024 * 1024) {
+        alert(`حجم الملف يتجاوز الحد المسموح (${maxMB} MB). يمكنك تعديل الحد من الإعدادات بالأعلى.`);
+        return;
+      }
+
+      document.getElementById('uploadCard').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('progressCard').style.display = 'block';
+      document.getElementById('progressFilename').textContent = `جارٍ معالجة: ${selectedFile.name}`;
+      document.getElementById('langDetected').style.display = 'none';
+      resetStepsUI();
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('transcription_provider', document.getElementById('transcribeProvider').value);
+      formData.append('translation_provider', document.getElementById('translateProvider').value);
+      const lang = document.getElementById('langSelect').value;
+      if (lang) formData.append('language', lang);
+      formData.append('max_file_size_mb', String(maxMB));
+      formData.append('compute_mode', document.getElementById('computeMode').value);
+      formData.append('transcription_mode', getTranscriptionMode());
+
+      hasActiveUpload = true;
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        let data = {};
+        try { data = await res.json(); } catch {}
+        if (res.status === 503) {
+          hasActiveUpload = false;
+          showShutdownOverlay();
+          return;
+        }
+        if (!res.ok || !data.success) throw new Error(data.detail || 'فشل رفع الملف');
+        hasActiveUpload = false;
+        activeJobId = data.job_id;
+        hasRunningJob = true;
+        listenWebSocket(data.job_id);
+      } catch (err) {
+        hasActiveUpload = false;
+        alert('خطأ: ' + err.message);
+        resetUI();
+      }
+    }
+
+    function handleJobUpdate(msg) {
+      const pct = typeof msg.progress === 'number' ? msg.progress : 0;
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressPct').textContent = pct + '%';
+      document.getElementById('stageText').textContent = msg.stage || 'جارٍ المعالجة...';
+      if (msg.detected_language) {
+        document.getElementById('langDetected').style.display = 'inline-block';
+        document.getElementById('langName').textContent = langCodeToName(msg.detected_language) + ` (${msg.detected_language})`;
+      }
+      updateSteps(msg.stages);
+
+      if (msg.status === 'completed' || msg.status === 'completed_with_warnings') {
+        hasRunningJob = false;
+        cleanupSockets();
+        showResults(msg);
+      } else if (msg.status === 'cancelled') {
+        hasRunningJob = false;
+        cleanupSockets();
+        resetUI();
+      } else if (msg.status === 'failed') {
+        hasRunningJob = false;
+        cleanupSockets();
+        alert('فشلت العملية: ' + (msg.error || 'خطأ غير معروف'));
+        resetUI();
+      }
+    }
+
+    function cleanupSockets() {
+      if (activeWs) {
+        try { activeWs.close(); } catch {}
+        activeWs = null;
+      }
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
+    function listenWebSocket(jobId) {
+      cleanupSockets();
+      const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      activeWs = new WebSocket(`${wsProtocol}//${location.host}/ws/${jobId}`);
+
+      activeWs.onmessage = (event) => {
+        try {
+          handleJobUpdate(JSON.parse(event.data));
+        } catch (e) { console.error(e); }
+      };
+
+      activeWs.onerror = () => {
+        // Fallback polling if WS closes unexpectedly during long jobs
+        if (!pollTimer && activeJobId === jobId) {
+          pollTimer = setInterval(async () => {
+            if (!activeJobId) { clearInterval(pollTimer); return; }
+            try {
+              const r = await fetch(`/api/jobs/${activeJobId}`);
+              if (r.ok) handleJobUpdate(await r.json());
+            } catch {}
+          }, 1500);
+        }
+      };
+    }
+
+    async function cancelCurrentJob() {
+      if (!activeJobId) {
+        alert('لا توجد عملية جارية حالياً.');
+        return;
+      }
+      if (!confirm('هل أنت متأكد من إلغاء المعالجة وتنظيف الملفات المؤقتة؟')) return;
+
+      const btn = document.getElementById('btnCancelJob');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ جارٍ الإلغاء والتنظيف...';
+      }
+      try {
+        const res = await fetch(`/api/cancel/${activeJobId}`, { method: 'POST' });
+        const data = await res.json();
+        alert(data.message || 'تم إلغاء المعالجة وتنظيف الملفات المؤقتة.');
+      } catch (err) {
+        alert('تم إرسال أمر الإلغاء: ' + err);
+      } finally {
+        cleanupSockets();
+        activeJobId = null;
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '⛔ إلغاء المعالجة وتنظيف الملفات';
+        }
+        resetUI();
+      }
+    }
+
+    async function showResults(data) {
+      document.getElementById('progressCard').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'block';
+
+      const qcBanner = document.getElementById('qcBanner');
+      const qcText = document.getElementById('qcBannerText');
+      const wCount = data.warnings_count || 0;
+      if (wCount > 0 || data.status === 'completed_with_warnings') {
+        qcBanner.style.display = 'block';
+        qcText.innerHTML = `⚠️ <b>تنبيه فحص الجودة (QC):</b> اكتملت المعالجة مع <b>${wCount}</b> ملاحظة (تم حفظ تقرير التدقيق بجانب المخرجات).`;
+      } else {
+        qcBanner.style.display = 'none';
+      }
+
+      document.getElementById('resWhisperTime').textContent = (data.whisper_time || 0).toFixed(1) + 's';
+      document.getElementById('resTransTime').textContent = (data.translation_time || 0).toFixed(1) + 's';
+      document.getElementById('resTotalTime').textContent = (data.total_time || 0).toFixed(1) + 's';
+      document.getElementById('resSegments').textContent = data.segment_count || 0;
+      document.getElementById('resDetectedLang').textContent = langCodeToName(data.detected_language) || 'تلقائي';
+
+      const jId = data.id || activeJobId;
+      document.getElementById('dlSrtBtn').href = data.srt_path || `/api/download/${jId}/srt`;
+      document.getElementById('dlAssBtn').href = data.ass_path || `/api/download/${jId}/ass`;
+      document.getElementById('dlVttBtn').href = `/api/download/${jId}/vtt`;
+
+      const isAudioOnly = selectedFile && AUDIO_ONLY_EXTS.test(selectedFile.name);
+      const videoWrap = document.getElementById('videoWrap');
+      const showPlayer = Boolean(data.video_url && !isAudioOnly);
+      videoWrap.style.display = showPlayer ? 'block' : 'none';
+      if (showPlayer) {
+        const video = document.getElementById('videoPreview');
+        video.src = data.video_url;
+        document.getElementById('subTrack').src = data.vtt_path || `/api/subtitles/${jId}/vtt`;
+      }
+
+      // Live SRT text preview (works for video, audio, and imported subtitle jobs)
+      try {
+        const prevRes = await fetch(`/api/preview/${jId}?lines=20`);
+        if (prevRes.ok) {
+          const prevData = await prevRes.json();
+          document.getElementById('srtPreview').textContent = prevData.preview || '';
+          document.getElementById('previewCount').textContent = prevData.total || data.segment_count || 0;
+          document.getElementById('previewSection').style.display = 'block';
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    function togglePreview() {
+      const box = document.getElementById('srtPreview');
+      const btn = document.getElementById('previewToggleBtn');
+      previewVisible = !previewVisible;
+      box.style.display = previewVisible ? 'block' : 'none';
+      btn.textContent = previewVisible ? 'إخفاء ▲' : 'إظهار ▼';
+    }
+
+    function resetUI() {
+      cleanupSockets();
+      hasRunningJob = false;
+      hasActiveUpload = false;
+      activeJobId = null;
+      selectedFile = null;
+      document.getElementById('fileInput').value = '';
+      document.getElementById('fileLabel').textContent = 'اسحب الفيديو أو الملف الصوتي أو ملف الترجمة هنا';
+      document.getElementById('btnStart').disabled = true;
+      document.getElementById('audioOptionsWrap').style.opacity = '1';
+      document.getElementById('transcribeProvider').disabled = false;
+      document.getElementById('uploadCard').style.display = 'block';
+      document.getElementById('progressCard').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('progressBar').style.width = '0%';
+      document.getElementById('progressPct').textContent = '0%';
+      document.getElementById('srtPreview').textContent = '';
+      resetStepsUI();
+    }
+
+    function langCodeToName(code) {
+      const map = {
+        en: 'الإنجليزية', fr: 'الفرنسية', de: 'الألمانية', es: 'الإسبانية',
+        it: 'الإيطالية', pt: 'البرتغالية', ru: 'الروسية', ja: 'اليابانية',
+        ko: 'الكورية', zh: 'الصينية', tr: 'التركية', ar: 'العربية',
+      };
+      return map[code] || (code ? code.toUpperCase() : '');
+    }
+
+    // Setup Wizard Logic
+    function openWizard() {
+      document.getElementById('wizardModal').style.display = 'flex';
+      loadSetupStatus();
+    }
+    function closeWizard() {
+      document.getElementById('wizardModal').style.display = 'none';
+    }
+    function switchWizardTab(tab) {
+      const cTab = document.getElementById('wizCloudTab');
+      const lTab = document.getElementById('wizLocalTab');
+      const cBtn = document.getElementById('tabCloudBtn');
+      const lBtn = document.getElementById('tabLocalBtn');
+      if (tab === 'cloud') {
+        cTab.style.display = 'block'; lTab.style.display = 'none';
+        cBtn.style.borderColor = 'var(--primary)'; cBtn.style.color = 'var(--text)';
+        lBtn.style.borderColor = 'var(--border)'; lBtn.style.color = 'var(--muted)';
+      } else {
+        cTab.style.display = 'none'; lTab.style.display = 'block';
+        lBtn.style.borderColor = 'var(--primary)'; lBtn.style.color = 'var(--text)';
+        cBtn.style.borderColor = 'var(--border)'; cBtn.style.color = 'var(--muted)';
+      }
+    }
+
+    async function loadSetupStatus() {
+      try {
+        const res = await fetch('/api/setup/status');
+        const data = await res.json();
+
+        document.getElementById('wizGpu').textContent = data.hardware.gpu_name;
+        document.getElementById('wizCuda').textContent = data.hardware.cuda_available
+          ? `✅ CUDA متوفر (${data.hardware.vram_mb} MB VRAM)`
+          : '⚠️ لا يوجد CUDA؛ سيعمل بالمعالج';
+
+        const ffmpegEl = document.getElementById('wizFfmpeg');
+        const btnFfmpeg = document.getElementById('btnInstallFfmpeg');
+        if (data.dependencies.ffmpeg_installed) {
+          ffmpegEl.innerHTML = '<span style="color:var(--green)">✅ مثبت وجاهز</span>';
+          btnFfmpeg.style.display = 'none';
+        } else {
+          ffmpegEl.innerHTML = '<span style="color:var(--red)">❌ غير متوفر</span>';
+          btnFfmpeg.style.display = 'inline-block';
+        }
+
+        const wReady = data.models.whisper_local_cached;
+        const nReady = data.models.nllb_local_cached;
+        document.getElementById('statWhisperLocal').innerHTML = wReady ? '<span style="color:var(--green)">✅ متوفر محلياً</span>' : 'غير محمل بعد';
+        document.getElementById('btnDlWhisper').disabled = wReady;
+        document.getElementById('btnDlWhisper').textContent = wReady ? 'جاهز' : 'تحميل';
+
+        document.getElementById('statNllbLocal').innerHTML = nReady ? '<span style="color:var(--green)">✅ متوفر محلياً</span>' : 'غير محمل (~1.2GB)';
+        document.getElementById('btnDlNllb').disabled = nReady;
+        document.getElementById('btnDlNllb').textContent = nReady ? 'جاهز' : 'تحميل';
+
+        // Update Settings Memory Box
+        document.getElementById('localMemoryBox').innerHTML =
+          `<strong>📊 حالة الجهاز والنماذج:</strong> GPU: ${data.hardware.gpu_name}` +
+          `${data.hardware.cuda_available ? ` (${data.hardware.vram_mb} MB VRAM)` : ''} · ` +
+          `Whisper: ${wReady ? '✅ مخزن محلياً' : 'سيُحمل عند الاستخدام'} · ` +
+          `NLLB-200: ${nReady ? '✅ مخزن محلياً' : 'غير محمل'} · ` +
+          `FFmpeg: ${data.dependencies.ffmpeg_installed ? '✅ جاهز' : '⚠️ غير مثبت'}`;
+
+        if (data.cloud_apis.gemini_configured) document.getElementById('wizGeminiKey').placeholder = '•••••••••••••••• (محفوظ مسبقاً)';
+        if (data.cloud_apis.groq_configured) document.getElementById('wizGroqKey').placeholder = '•••••••••••••••• (محفوظ مسبقاً)';
+        return data;
+      } catch (err) {
+        console.error('Setup status error:', err);
+      }
+    }
+
+    async function saveWizardCloud() {
+      const gemini = document.getElementById('wizGeminiKey').value.trim();
+      const groq = document.getElementById('wizGroqKey').value.trim();
+      if (!gemini && !groq) {
+        alert('الرجاء إدخال مفتاح Gemini أو Groq واحد على الأقل.');
+        return;
+      }
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gemini_key: gemini || undefined, groq_key: groq || undefined })
+      });
+      if (gemini) document.getElementById('translateProvider').value = 'gemini';
+      else if (groq) document.getElementById('translateProvider').value = 'groq';
+      if (groq) document.getElementById('transcribeProvider').value = 'groq';
+      alert('تم حفظ مفاتيح الـ API بنجاح!');
+      closeWizard();
+      loadRuntimeSettings();
+    }
+
+    let dlPollTimer = null;
+    async function downloadModel(modelType) {
+      const box = document.getElementById('wizDlStatus');
+      const taskText = document.getElementById('wizDlTask');
+      box.style.display = 'block';
+      taskText.textContent = `جارٍ بدء تحميل نموذج ${modelType}...`;
+      hasActiveDownload = true;
+      try {
+        const dlRes = await fetch('/api/setup/download-model', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model_type: modelType })
+        });
+        if (dlRes.status === 503) {
+          hasActiveDownload = false;
+          showShutdownOverlay();
+          return;
+        }
+        if (!dlRes.ok) {
+          let errJson = {};
+          try { errJson = await dlRes.json(); } catch {}
+          throw new Error(errJson.detail || `HTTP ${dlRes.status}`);
+        }
+        if (dlPollTimer) clearInterval(dlPollTimer);
+        dlPollTimer = setInterval(async () => {
+          try {
+            const statusRes = await fetch('/api/setup/status');
+            if (!statusRes.ok) return;
+            const s = await statusRes.json();
+            if (s.download_progress.status === 'downloading') {
+              taskText.textContent = `${s.download_progress.current_task} (${s.download_progress.percent}%)`;
+            } else if (s.download_progress.status === 'completed') {
+              hasActiveDownload = false;
+              clearInterval(dlPollTimer);
+              dlPollTimer = null;
+              taskText.textContent = '✅ اكتمل التحميل بنجاح!';
+              loadSetupStatus();
+              setTimeout(() => { box.style.display = 'none'; }, 3000);
+            } else if (s.download_progress.status === 'failed') {
+              hasActiveDownload = false;
+              clearInterval(dlPollTimer);
+              dlPollTimer = null;
+              taskText.textContent = '❌ ' + s.download_progress.current_task;
+            }
+          } catch {}
+        }, 1500);
+      } catch (e) {
+        hasActiveDownload = false;
+        taskText.textContent = 'خطأ: ' + e.message;
+      }
+    }
+
+    async function installFfmpeg() {
+      const box = document.getElementById('wizDlStatus');
+      const taskText = document.getElementById('wizDlTask');
+      box.style.display = 'block';
+      taskText.textContent = 'جارٍ تحميل وتثبيت FFmpeg المحمول...';
+      hasActiveDownload = true;
+      try {
+        const ffRes = await fetch('/api/setup/install-ffmpeg', { method: 'POST' });
+        if (ffRes.status === 503) {
+          hasActiveDownload = false;
+          showShutdownOverlay();
+          return;
+        }
+        if (!ffRes.ok) {
+          let errJson = {};
+          try { errJson = await ffRes.json(); } catch {}
+          throw new Error(errJson.detail || `HTTP ${ffRes.status}`);
+        }
+        if (dlPollTimer) clearInterval(dlPollTimer);
+        dlPollTimer = setInterval(async () => {
+          try {
+            const statusRes = await fetch('/api/setup/status');
+            if (!statusRes.ok) return;
+            const s = await statusRes.json();
+            if (s.download_progress.status === 'downloading') {
+              taskText.textContent = `${s.download_progress.current_task} (${s.download_progress.percent}%)`;
+            } else if (s.download_progress.status === 'completed') {
+              hasActiveDownload = false;
+              clearInterval(dlPollTimer);
+              dlPollTimer = null;
+              taskText.textContent = '✅ تم تثبيت FFmpeg بنجاح!';
+              loadSetupStatus();
+              setTimeout(() => { box.style.display = 'none'; }, 3000);
+            } else if (s.download_progress.status === 'failed') {
+              hasActiveDownload = false;
+              clearInterval(dlPollTimer);
+              dlPollTimer = null;
+              taskText.textContent = '❌ ' + s.download_progress.current_task;
+            }
+          } catch {}
+        }, 1500);
+      } catch (e) {
+        hasActiveDownload = false;
+        taskText.textContent = 'خطأ: ' + e.message;
+      }
+    }
+
+    function generateLifecycleUuid() {
+      return (window.crypto && typeof window.crypto.randomUUID === 'function')
+        ? window.crypto.randomUUID()
+        : ('id-' + Math.random().toString(36).slice(2) + '-' + Date.now());
+    }
+
+    const LIFECYCLE_TOKEN = (
+      document.querySelector('meta[name="cinematic-lifecycle-token"]')?.getAttribute('content') || ''
+    );
+    const LIFECYCLE_TAB_ID = generateLifecycleUuid();
+    let lifecycleWs = null;
+    let activeLifecycleConnId = null;
+    let lifecycleConnGen = 0;
+    let lifecycleReconnectTimer = null;
+    let appShuttingDown = false;
+    let shutdownInProgress = false;
+    let pageHiddenPendingRestore = false;
+
+    function showShutdownOverlay(customMessage) {
+      shutdownInProgress = false;
+      if (typeof shutdownApplication === 'function') {
+        shutdownApplication._finishAttempt?.();
+        shutdownApplication._inProgress = false;
+      }
+      appShuttingDown = true;
+      hasRunningJob = false;
+      hasActiveUpload = false;
+      hasActiveDownload = false;
+      activeJobId = null;
+      if (lifecycleReconnectTimer) {
+        clearTimeout(lifecycleReconnectTimer);
+        lifecycleReconnectTimer = null;
+      }
+      if (typeof dlPollTimer !== 'undefined' && dlPollTimer) {
+        clearInterval(dlPollTimer);
+        dlPollTimer = null;
+      }
+      cleanupSockets();
+      if (lifecycleWs) {
+        try { lifecycleWs.close(); } catch {}
+        lifecycleWs = null;
+      }
+      activeLifecycleConnId = null;
+      const btn = document.getElementById('btnShutdownApp');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏻ تم الإيقاف';
+      }
+      if (customMessage) {
+        const desc = document.getElementById('shutdownDesc');
+        if (desc) desc.textContent = customMessage;
+      }
+      const overlay = document.getElementById('shutdownOverlay');
+      if (overlay && overlay.style) overlay.style.display = 'flex';
+    }
+
+    function connectLifecycleChannel() {
+      if (appShuttingDown || pageHiddenPendingRestore) return;
+      if (lifecycleWs && (lifecycleWs.readyState === WebSocket.OPEN || lifecycleWs.readyState === WebSocket.CONNECTING)) {
+        return;
+      }
+      const connId = generateLifecycleUuid();
+      lifecycleConnGen += 1;
+      const connGen = lifecycleConnGen;
+      activeLifecycleConnId = connId;
+
+      const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const qs = new URLSearchParams({
+        tab_id: LIFECYCLE_TAB_ID,
+        conn_id: connId,
+        gen: String(connGen),
+        token: LIFECYCLE_TOKEN
+      });
+      const ws = new WebSocket(`${wsProtocol}//${location.host}/api/lifecycle/ws?${qs.toString()}`);
+      lifecycleWs = ws;
+
+      ws.onopen = () => {
+        if (lifecycleReconnectTimer) {
+          clearTimeout(lifecycleReconnectTimer);
+          lifecycleReconnectTimer = null;
+        }
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload && payload.type === 'shutdown') {
+            showShutdownOverlay();
+          }
+        } catch {}
+      };
+
+      ws.onclose = () => {
+        if (lifecycleWs === ws) lifecycleWs = null;
+        if (!appShuttingDown && !pageHiddenPendingRestore && !lifecycleReconnectTimer) {
+          lifecycleReconnectTimer = setTimeout(() => {
+            lifecycleReconnectTimer = null;
+            connectLifecycleChannel();
+          }, 1000);
+        }
+      };
+    }
+
+    function notifyTabClosing() {
+      if (appShuttingDown) return;
+      pageHiddenPendingRestore = true;
+      if (lifecycleReconnectTimer) {
+        clearTimeout(lifecycleReconnectTimer);
+        lifecycleReconnectTimer = null;
+      }
+      const leavingConnId = activeLifecycleConnId;
+      const leavingConnGen = lifecycleConnGen;
+      activeLifecycleConnId = null;
+      const wsToClose = lifecycleWs;
+      lifecycleWs = null;
+      if (wsToClose && (wsToClose.readyState === WebSocket.OPEN || wsToClose.readyState === WebSocket.CONNECTING)) {
+        try { wsToClose.close(1000, 'pagehide'); } catch {}
+      }
+      if (!leavingConnId) return;
+
+      const payloadJson = JSON.stringify({
+        tab_id: LIFECYCLE_TAB_ID,
+        conn_id: leavingConnId,
+        gen: leavingConnGen,
+        token: LIFECYCLE_TOKEN
+      });
+      const url = '/api/lifecycle/leave';
+      const body = new Blob([payloadJson], { type: 'application/json' });
+      const sentBeacon = (typeof navigator.sendBeacon === 'function')
+        ? navigator.sendBeacon(url, body)
+        : false;
+      if (!sentBeacon) {
+        try {
+          fetch(url, {
+            method: 'POST',
+            body: payloadJson,
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Lifecycle-Token': LIFECYCLE_TOKEN
+            },
+            keepalive: true
+          });
+        } catch {}
+      }
+    }
+
+    window.addEventListener('pagehide', notifyTabClosing);
+    window.addEventListener('pageshow', (event) => {
+      pageHiddenPendingRestore = false;
+      if ((event.persisted || !lifecycleWs) && !appShuttingDown) {
+        connectLifecycleChannel();
+      }
+    });
+    window.addEventListener('beforeunload', (e) => {
+      if (!appShuttingDown && hasActiveWork()) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    async function shutdownApplication() {
+      const isBusy = Boolean(
+        appShuttingDown
+        || (typeof shutdownInProgress !== 'undefined' && shutdownInProgress)
+        || shutdownApplication._inProgress
+      );
+      if (isBusy) return;
+      const promptMsg = hasActiveWork()
+        ? 'توجد عملية معالجة أو تحميل جارية حالياً. هل تريد إيقاف البرنامج بالكامل وإلغاء العملية وتنظيف الملفات المؤقتة؟'
+        : 'هل تريد إيقاف تشغيل برنامج CinematicSRT v2.0 بالكامل؟';
+      if (!confirm(promptMsg)) return;
+      if (
+        appShuttingDown
+        || (typeof shutdownInProgress !== 'undefined' && shutdownInProgress)
+        || shutdownApplication._inProgress
+      ) {
+        return;
+      }
+
+      const setShutdownInProgress = (inProgress) => {
+        shutdownApplication._inProgress = Boolean(inProgress);
+        if (typeof shutdownInProgress !== 'undefined') {
+          shutdownInProgress = Boolean(inProgress);
+        }
+      };
+
+      setShutdownInProgress(true);
+      const btn = document.getElementById('btnShutdownApp');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ جارٍ الإيقاف...';
+      }
+      if (lifecycleReconnectTimer) {
+        clearTimeout(lifecycleReconnectTimer);
+        lifecycleReconnectTimer = null;
+      }
+
+      const controller = typeof AbortController === 'function' ? new AbortController() : null;
+      let active = true;
+      let timer;
+      let stopWaiting;
+      const stopped = new Promise((_, reject) => { stopWaiting = reject; });
+      const bounded = (operation) => Promise.race([operation, stopped]);
+      stopped.catch(() => {});
+
+      const finishAttempt = () => {
+        if (!active) return;
+        active = false;
+        if (timer !== undefined) clearTimeout(timer);
+        shutdownApplication._finishAttempt = null;
+        controller?.abort();
+        stopWaiting(new Error('Shutdown confirmation attempt ended'));
+      };
+      shutdownApplication._finishAttempt = finishAttempt;
+      if (typeof setTimeout === 'function' && typeof clearTimeout === 'function') {
+        timer = setTimeout(() => {
+          if (!active || appShuttingDown) return;
+          restoreShutdownControls();
+          alert('تعذر تأكيد إيقاف الخادم خلال المهلة. تم الإبقاء على الجلسة الحالية، يمكنك إعادة المحاولة.');
+        }, 10000);
+      }
+
+      const restoreShutdownControls = () => {
+        finishAttempt();
+        setShutdownInProgress(false);
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '⏻ إيقاف البرنامج';
+          btn.title = 'إيقاف الخادم والبرنامج بالكامل';
+        }
+        if (!appShuttingDown && !pageHiddenPendingRestore && !lifecycleWs) {
+          connectLifecycleChannel();
+        }
+      };
+
+      const completePositiveShutdown = () => {
+        finishAttempt();
+        setShutdownInProgress(false);
+        appShuttingDown = true;
+        hasRunningJob = false;
+        hasActiveUpload = false;
+        hasActiveDownload = false;
+        activeJobId = null;
+        if (typeof dlPollTimer !== 'undefined' && dlPollTimer) {
+          clearInterval(dlPollTimer);
+          dlPollTimer = null;
+        }
+        cleanupSockets();
+        if (lifecycleWs) {
+          try { lifecycleWs.close(); } catch {}
+          lifecycleWs = null;
+        }
+        activeLifecycleConnId = null;
+        showShutdownOverlay();
+        try { window.close(); } catch {}
+      };
+
+      let resp = null;
+      let fetchErr = null;
+      try {
+        resp = await bounded(fetch('/api/shutdown', {
+          signal: controller?.signal,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Lifecycle-Token': LIFECYCLE_TOKEN
+          },
+          body: JSON.stringify({ token: LIFECYCLE_TOKEN })
+        }));
+      } catch (err) {
+        fetchErr = err;
+      }
+
+      if (!active && !appShuttingDown) return;
+      if (appShuttingDown) {
+        setShutdownInProgress(false);
+        try { window.close(); } catch {}
+        return;
+      }
+
+      if (resp && resp.status === 403) {
+        restoreShutdownControls();
+        alert('انتهت صلاحية جلسة المتصفح أو تغيّرت. يرجى تحديث الصفحة ثم المحاولة مجدداً.');
+        return;
+      }
+
+      const isRespOk = Boolean(
+        resp && (
+          typeof resp.ok === 'boolean'
+            ? resp.ok
+            : (typeof resp.status === 'number' && resp.status >= 200 && resp.status < 300)
+        )
+      );
+      if (resp && !isRespOk) {
+        let errDetail = '';
+        if (typeof resp.json === 'function') {
+          try {
+            const errData = await bounded(resp.json());
+            if (errData && errData.detail) errDetail = ` (${errData.detail})`;
+          } catch {}
+        }
+        if (!active) return;
+        restoreShutdownControls();
+        alert(`تعذر إيقاف البرنامج (رمز الاستجابة ${resp.status})${errDetail}.`);
+        return;
+      }
+
+      if (resp && isRespOk && !fetchErr) {
+        let payloadConfirmed = false;
+        let errDetail = '';
+        if (typeof resp.json === 'function') {
+          try {
+            const sdData = await bounded(resp.json());
+            payloadConfirmed = Boolean(sdData && typeof sdData === 'object' && sdData.success === true);
+            if (!sdData || typeof sdData !== 'object' || sdData.success !== true) {
+              payloadConfirmed = false;
+              if (sdData && typeof sdData === 'object' && sdData.detail) {
+                errDetail = ` (${sdData.detail})`;
+              }
+            }
+          } catch {
+            payloadConfirmed = false;
+          }
+          if (!active && !appShuttingDown) return;
+          if (appShuttingDown) {
+            setShutdownInProgress(false);
+            try { window.close(); } catch {}
+            return;
+          }
+        }
+        if (!payloadConfirmed) {
+          restoreShutdownControls();
+          alert(`تعذر تأكيد إيقاف البرنامج${errDetail}. تم الإبقاء على الجلسة الحالية، يرجى المحاولة مجدداً.`);
+          return;
+        }
+        completePositiveShutdown();
+        return;
+      }
+
+      let healthOutcome = 'unknown';
+      try {
+        const healthResp = await bounded(fetch('/api/health', { cache: 'no-store', signal: controller?.signal }));
+        if (!active && !appShuttingDown) return;
+        if (appShuttingDown) {
+          setShutdownInProgress(false);
+          try { window.close(); } catch {}
+          return;
+        }
+        if (healthResp) {
+          let healthData = null;
+          if (typeof healthResp.json === 'function') {
+            try { healthData = await bounded(healthResp.json()); } catch {}
+            if (!active && !appShuttingDown) return;
+            if (appShuttingDown) {
+              setShutdownInProgress(false);
+              try { window.close(); } catch {}
+              return;
+            }
+          }
+          const isV2Service = Boolean(
+            healthData
+            && typeof healthData === 'object'
+            && (!healthData.service || healthData.service === 'CinematicSRT v2.0')
+          );
+          const isHealthOk = Boolean(
+            healthResp && (
+              typeof healthResp.ok === 'boolean'
+                ? healthResp.ok
+                : (typeof healthResp.status === 'number' && healthResp.status >= 200 && healthResp.status < 300)
+            )
+          );
+          if (healthResp.status === 503 && isV2Service && healthData.status === 'shutting_down') {
+            healthOutcome = 'shutting_down';
+          } else if (isHealthOk) {
+            healthOutcome = 'alive';
+          }
+        }
+      } catch {}
+
+      if (!active && !appShuttingDown) return;
+      if (appShuttingDown) {
+        setShutdownInProgress(false);
+        try { window.close(); } catch {}
+        return;
+      }
+
+      if (healthOutcome === 'shutting_down') {
+        setShutdownInProgress(true);
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = '⏳ جارٍ الإيقاف...';
+          btn.title = 'إيقاف الخادم قيد التنفيذ حالياً...';
+        }
+        if (!appShuttingDown && !pageHiddenPendingRestore && !lifecycleWs) {
+          connectLifecycleChannel();
+        }
+        return;
+      }
+
+      restoreShutdownControls();
+      if (healthOutcome === 'alive') {
+        alert('تعذر تنفيذ أمر الإيقاف بينما الخادم ما زال يعمل. يرجى المحاولة مجدداً.');
+      } else {
+        alert('تعذر التحقق من إيقاف الخادم. تم الإبقاء على الجلسة الحالية، يمكنك إعادة المحاولة.');
+      }
+      return;
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      pageHiddenPendingRestore = false;
+      connectLifecycleChannel();
+      await loadRuntimeSettings();
+      const status = await loadSetupStatus();
+      if (status && status.first_run_needed) {
+        openWizard();
+      }
+    });
+  </script>
+</body>
+</html>

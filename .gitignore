@@ -1,0 +1,35 @@
+# Environments & Caches
+venv/
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# User Uploads and Media
+uploads/*
+!uploads/.gitkeep
+temp/*
+!temp/.gitkeep
+outputs/*
+!outputs/.gitkeep
+
+# Temporary and Partial Files
+*.part
+*.wav
+*.mp4
+*.mkv
+*.avi
+*.log
+
+# OS Specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Additional Local Safety Rules
+.env.*
+bin/
+*.lnk
